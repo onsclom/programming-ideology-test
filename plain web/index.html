@@ -1,0 +1,70 @@
+<body>
+<canvas width="400px" height="400px" id="gc"></canvas>
+</body>
+<script type="text/javascript">
+ctx = document.getElementById("gc").getContext("2d")
+px = py = 200
+enemies = []
+frame = 0
+
+keysDown = new Set()
+onkeydown = (event) => 
+	keysDown.add(event.key)
+onkeyup = (event) => 
+	keysDown.delete(event.key)
+
+update = () => {
+	ctx.fillStyle = "black"
+	ctx.fillRect(0, 0, 400, 400)
+
+	frame += 1
+	if (frame % 7 == 0)
+		enemies.push({
+			x: Math.random()*400,
+			y: -10,
+			dy: Math.random()+1
+		})
+
+	if (keysDown.has("ArrowUp")) py -= 2
+	if (keysDown.has("ArrowLeft")) px -= 2
+	if (keysDown.has("ArrowDown")) py += 2
+	if (keysDown.has("ArrowRight")) px += 2
+	px = Math.max(10, Math.min(390, px))
+	py = Math.max(10, Math.min(390, py))
+
+	enemies.forEach(e => {
+		e.y += e.dy
+		ctx.beginPath()
+		ctx.fillStyle = "pink"
+		ctx.ellipse(e.x, e.y, 10, 10, 0, 0, Math.PI*2)
+		ctx.fill()
+
+		let distance = Math.sqrt((e.x-px)**2+(e.y-py)**2)
+		if (distance < 20) {
+			px = py = 200
+			enemies = []
+		}
+	})
+
+	ctx.beginPath()
+	ctx.fillStyle = "lightblue"
+	ctx.ellipse(px, py, 10, 10, 0, 0, Math.PI*2)
+	ctx.fill()
+
+	requestAnimationFrame(update)
+}
+update()
+</script>
+<style>
+html, body {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+canvas {
+	width: 400px;
+	height: 400px;
+}
+</style>
